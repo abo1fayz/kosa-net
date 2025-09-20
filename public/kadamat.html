@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز إصلاح الموبايلات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            direction: rtl;
+            line-height: 1.6;
+        }
+
+        .app-layout {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 70px;
+        }
+
+        /* شريط علوي (App Bar) */
+        .top-bar {
+            background-color: #fff;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .logo-container {
+            flex: 1;
+            text-align: center;
+        }
+
+        .logo {
+            height: 100px;
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .admin-link {
+            color: #4a6bdf;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        /* قسم الخدمات */
+        .services-section {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #4a6bdf;
+            display: inline-block;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .service-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            color: #4a6bdf;
+            margin-bottom: 15px;
+        }
+
+        .service-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .service-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* قسم معرض الإصلاحات */
+        .gallery-section {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            height: 200px;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* قسم الاتصال */
+        .contact-section {
+            padding: 20px;
+        }
+
+        .contact-info {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+            color: #4a6bdf;
+            margin-left: 15px;
+        }
+
+        .whatsapp-btn {
+            display: inline-block;
+            background-color: #25D366;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .whatsapp-btn:hover {
+            background-color: #128C7E;
+        }
+
+        /* شريط التنقل السفلي */
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: #fff;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 1200px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .nav-item.active {
+            color: #4a6bdf;
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        /* تصميم متجاوب */
+        @media (max-width: 768px) {
+            .services-grid, .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .service-card {
+                padding: 15px;
+            }
+            
+            .logo {
+                height: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .services-grid, .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-bar {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- الشريط العلوي -->
+        <header class="top-bar">
+            <!-- <a href="adminmob.html" class="admin-link">لوحة التحكم</a> -->
+            <div class="logo-container">
+                <!-- <img src="./logo.png" alt="مركز إصلاح الموبايلات" class="logo"> -->
+                 <p style="text-align: center;"> شركة الكوسا للاتصالات-قسم الخدمات العامة</p>
+            </div>
+            <div></div> <!-- عنصر نائب للمحاذاة -->
+        </header>
+
+        <!-- قسم الخدمات -->
+        <section class="services-section">
+            <h2 class="section-title">خدماتنا</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <img style="width: 100px;" src="./phone.png" alt="">
+                    <h3 class="service-title">بيع و شراء الهواتف</h3>
+                    
+                </div>
+                <div class="service-card">
+                    <i class="fa-solid fa-screwdriver-wrench service-icon"></i>
+                    <h3 class="service-title"> صياانة الهواتف</h3>
+                    
+                </div>
+                <div class="service-card">
+                    <i class="fa-solid fa-dollar-sign service-icon"></i>
+                    <h3 class="service-title"> شحن الالعاب والتطبيقات</h3>
+                    
+                </div>
+                <div class="service-card">
+                    <i class="fa-solid fa-wifi service-icon"></i>
+                    <h3 class="service-title">توفير قطع الانترنت</h3>
+                    
+                </div>
+                <div class="service-card">
+                    <i class="fa-solid fa-plug service-icon"></i>
+                    <h3 class="service-title"> قطع كهربائية متنوعة </h3>
+                    
+                </div>
+                <div class="service-card">
+                    <img style="width: 100px;" src="./cctv-camera.png" alt="">
+                    <h3 class="service-title"> كاميرات مراقبة</h3>
+                    
+                </div>
+            </div>
+        </section>
+
+       
+
+        <!-- قسم الاتصال -->
+        <section class="contact-section">
+            <h2 class="section-title">اتصل بنا</h2>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-phone contact-icon"></i>
+                    <span>الهاتف: 905387709053+</span>
+                </div>
+                <div class="contact-item">
+                    <i style="font-size: 1.5rem;
+            color: #4a6bdf;
+            margin-left: 15px;" class="fa-solid fa-envelope"></i>
+                    <span>الايميل:kwsaahmd14@gmail.com</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt contact-icon"></i>
+                    <span>العنوان:مارع-منتصف الشارع العريض-جانب مكياج ياسمين</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-clock contact-icon"></i>
+                    <span>ساعات العمل: 9 صباحاً حتى 9 مساءً</span>
+                </div>
+                <a href="https://wa.me/905387709053?text=مرحباً، أريد الاستفسار عن خدمة التصليح" class="whatsapp-btn" target="_blank">
+                    <i class="fab fa-whatsapp"></i> اتصل بنا عبر واتساب
+                </a>
+            </div>
+        </section>
+
+        <!-- شريط التنقل السفلي -->
+        <!-- <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home nav-icon"></i>
+                <span>الرئيسية</span>
+            </a>
+            <a href="#services" class="nav-item">
+                <i class="fas fa-tools nav-icon"></i>
+                <span>الخدمات</span>
+            </a>
+            <a href="#gallery" class="nav-item">
+                <i class="fas fa-images nav-icon"></i>
+                <span>معرض الإصلاحات</span>
+            </a>
+            <a href="#contact" class="nav-item">
+                <i class="fas fa-phone nav-icon"></i>
+                <span>اتصل بنا</span>
+            </a>
+        </nav> -->
+    </div>
+
+    
+</body>
+</html>
