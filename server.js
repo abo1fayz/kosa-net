@@ -13,12 +13,13 @@ const Repair = require("./models/Repair");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ====================== إعداد Middleware ====================== //
+// ====================== Middleware ====================== //
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ملفات static (CSS, JS, الصور)
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"))); 
+// ⚠️ هذا سيجعل index.html في public يتم تقديمه تلقائيًا عند /
 
 // إعداد القوالب EJS
 app.set("view engine", "ejs");
@@ -44,11 +45,6 @@ mongoose
 
 // ====================== Routes ====================== //
 
-// الصفحة الرئيسية (index.html في مجلد public)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
 // صفحة تجريبية EJS
 app.get("/ap", (req, res) => {
   res.render("ui");
@@ -65,7 +61,7 @@ app.get("/repair-admin", (req, res) => {
 });
 
 // ====================== Product Routes ====================== //
-
+// (نفس الكود السابق بدون تغيير)
 // جلب جميع المنتجات
 app.get("/api/products", async (req, res) => {
   try {
@@ -167,7 +163,6 @@ app.delete("/api/products/:id", async (req, res) => {
 });
 
 // ====================== Repair Routes ====================== //
-
 // جلب جميع الإصلاحات
 app.get("/api/repairs", async (req, res) => {
   try {
@@ -228,6 +223,6 @@ app.delete("/api/repairs/:id", async (req, res) => {
 });
 
 // ====================== Server ====================== //
-app.listen(PORT, () =>
-  console.log(`🚀 Server is running on port ${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
