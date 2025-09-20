@@ -1,0 +1,341 @@
+/* public/styles.css */
+
+/* إعادة ضبط وتنسيقات عامة */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Cairo', sans-serif; /* استخدام خط القاهرة */
+    background-color: #f0f2f5; /* خلفية فاتحة تشبه تطبيقات الموبايل */
+    color: #333;
+    direction: rtl;
+    line-height: 1.6;
+    height: 100vh; /* ليأخذ كامل ارتفاع الشاشة */
+    overflow: hidden; /* لمنع ظهور scrollbars غير مرغوبة على مستوى body */
+}
+.update-data {
+  width: 100%;
+  overflow: hidden;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.slider p {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.images {
+  display: flex;
+  gap: 40px; /* مسافة بين الصور */
+  animation: slide 15s linear infinite;
+}
+
+.images img {
+  width: 70px;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.images img:hover {
+  transform: scale(1.1);
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+
+
+
+
+
+
+
+
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* شريط علوي (App Bar) */
+.top-bar {
+    
+    background-image: url("./photo_2025-09-19_22-25-34.jpg");
+     background-position: center;
+    width: 100%;
+    height: 800px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    color: #333;
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    position: sticky;  
+    top: 0;
+    z-index: 1000;
+}
+
+.top-bar-left, .top-bar-right {
+    display: flex;
+    align-items: center;
+}
+
+.menu-icon {
+    font-size: 1.5rem;
+    margin-left: 1rem;
+    color: #555;
+    cursor: pointer;
+}
+
+.app-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.admin-icon-link {
+    color: #555;
+    font-size: 1.3rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.admin-icon-link:hover {
+    color: #4285F4;
+}
+
+/* قسم البحث والفلاتر */
+.search-filter-section {
+    background-color: #f0f2f5;
+    padding: 1rem 1.2rem 0.5rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    position: sticky; /* يثبت هذا القسم أسفل الـ top-bar */
+    top: 60px; /* ارتفاع الـ top-bar */
+    z-index: 999;
+}
+
+.search-bar {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 3rem; /* مساحة للأيقونة */
+    border: none;
+    border-radius: 25px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    color: #333;
+}
+
+.search-bar input::placeholder {
+    color: #999;
+}
+
+.search-bar .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+    font-size: 1.1rem;
+}
+
+.categories-filter {
+    display: flex;
+    overflow-x: auto; /* يسمح بالتمرير الأفقي للفلاتر */
+    padding-bottom: 0.5rem; /* مسافة لـ scrollbar إن وجد */
+    -webkit-overflow-scrolling: touch; /* لتحسين التمرير على iOS */
+    scrollbar-width: none; /* إخفاء scrollbar في Firefox */
+    -ms-overflow-style: none;  /* إخفاء scrollbar في IE/Edge */
+}
+
+.categories-filter::-webkit-scrollbar { /* إخفاء scrollbar في Chrome/Safari/Opera */
+    display: none;
+}
+
+.category-btn {
+    flex-shrink: 0; /* لمنع الأزرار من الانكماش */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    margin-left: 0.8rem;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.category-btn.active {
+    background-color: #4CAF50; /* لون أخضر نشط */
+    color: #fff;
+    border-color: #4CAF50;
+}
+
+.category-btn:hover:not(.active) {
+    background-color: #f2f2f2;
+}
+
+/* المحتوى الرئيسي للمنتجات */
+.products-main-content {
+    flex-grow: 1; /* لتأخذ المساحة المتبقية */
+    overflow-x: auto; /* للسماح بالتمرير الرأسي للمحتوى */
+    padding: 0 1.2rem 1rem;
+     /* لتحسين التمرير على iOS */
+}
+
+.products-list {
+    display: flex;
+    flex-direction: row; /* ترتيب العناصر عموديًا */
+    gap: 15px; /* مسافة بين البطاقات */
+}
+
+/* بطاقة المنتج */
+.product-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: flex; /* لتخطيط الصورة والمعلومات جنبًا إلى جنب */
+    align-items: center;
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    padding: 1rem; /* مسافة داخل البطاقة */
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+}
+
+.product-card img {
+    width: 90px; /* حجم أصغر للصورة */
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px; /* حواف دائرية للصور */
+    margin-left: 1rem; /* مسافة على اليسار */
+    flex-shrink: 0; /* لمنع الصورة من الانكماش */
+}
+
+.product-info {
+    flex-grow: 1; /* لتأخذ المساحة المتبقية */
+    text-align: right; /* محاذاة النص لليمين */
+}
+
+.product-info h3 {
+    margin: 0 0 0.3rem 0;
+    color: #333;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.product-info p {
+    margin: 0 0 0.5rem 0;
+    color: #777;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.product-info .price {
+    font-weight: 700;
+    color: #2196F3; /* لون أزرق للسعر */
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+/* زر الواتساب (إذا أردت إضافته كما في الصورة) */
+.whatsapp-icon {
+    color: #25D366; /* لون واتساب */
+    font-size: 2rem;
+    margin-right: 0.5rem; /* مسافة على اليمين */
+}
+
+/* شريط التنقل السفلي */
+.bottom-nav {
+    background-color: #fff;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    position: sticky; /* يثبت الشريط في الأسفل */
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #777;
+    font-size: 0.8rem;
+    transition: color 0.3s ease;
+    padding: 0.3rem 0;
+    min-width: 60px; /* لضمان عرض كافٍ */
+}
+
+.nav-item.active {
+    color: #4285F4; /* لون أزرق نشط */
+    font-weight: 600;
+}
+
+.nav-item i {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+}
+
+/* رسالة "لا توجد منتجات" */
+.no-products {
+    text-align: center;
+    color: #777;
+    font-size: 1.1rem;
+    margin-top: 30px;
+}
+
+/* Spinner CSS (كما هو) */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #4CAF50; /* لون أخضر */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 50px auto;
+  display: none;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* تنسيقات شاشة الإدارة (تبقى كما هي أو تحدث لتناسب الأسلوب الجديد) */
+/* تم تضمينها بالفعل في CSS السابق، تأكد من تحديثها لـ Cairo font */
+.form-container input, .form-container textarea, .category-btn {
+    font-family: 'Cairo', sans-serif;
+}
