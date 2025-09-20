@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم مركز الإصلاح</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            direction: rtl;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #4a6bdf;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .admin-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #4a6bdf;
+            display: inline-block;
+        }
+
+        .upload-form {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+        }
+
+        button {
+            background-color: #4a6bdf;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #3a5bc9;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            height: 150px;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>لوحة تحكم مركز الإصلاح</h1>
+            <a href="index.html" class="back-link">العودة إلى الموقع الرئيسي</a>
+        </header>
+
+        <div class="admin-panel">
+            <h2 class="section-title">إضافة صورة للإصلاحات الناجحة</h2>
+            
+            <form id="upload-form" class="upload-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="title">عنوان الصورة (اختياري)</label>
+                    <input type="text" id="title" name="title" placeholder="مثال: إصلاح شاشة آيفون 12">
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">اختر صورة</label>
+                    <input type="file" id="image" name="image" accept="image/*" required>
+                </div>
+                
+                <button type="submit">رفع الصورة</button>
+            </form>
+
+            <div id="message"></div>
+
+            <h2 class="section-title">معرض الإصلاحات الحالي</h2>
+            <div class="gallery-grid" id="repairs-gallery">
+                <!-- سيتم ملء هذا القسم بالصور من خلال JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const uploadForm = document.getElementById('upload-form');
+            const repairsGallery = document.getElementById('repairs-gallery');
+            const messageDiv = document.getElementById('message');
+            
+            // دالة لعرض الرسائل
+            function showMessage(message, type) {
+                messageDiv.innerHTML = `<div class="message ${type}">${message}</div>`;
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 5000);
+            }
+            
+            // دالة لجلب وعرض صور الإصلاحات
+            const fetchAndDisplayRepairs = async () => {
+                try {
+                    repairsGallery.innerHTML = '<div class="loading">جاري تحميل الصور...</div>';
+                    
+                    const response = await fetch('/api/repairs');
+                    
+                    if (!response.ok) {
+                        throw new Error(`خطأ في جلب البيانات: ${response.status}`);
+                    }
+                    
+                    const repairs = await response.json();
+                    
+                    repairsGallery.innerHTML = ''; // مسح المحتوى القديم
+                    
+                    if (repairs.length === 0) {
+                        repairsGallery.innerHTML = '<p>لا توجد صور للإصلاحات بعد.</p>';
+                    } else {
+                        repairs.forEach(repair => {
+                            const galleryItem = document.createElement('div');
+                            galleryItem.classList.add('gallery-item');
+                            
+                            galleryItem.innerHTML = `
+                                <img src="${repair.imageURL}" alt="${repair.title || 'إصلاح ناجح'}">
+                                <div class="gallery-caption">${repair.title || 'إصلاح ناجح'}</div>
+                                <button class="delete-btn" data-id="${repair._id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            `;
+                            
+                            repairsGallery.appendChild(galleryItem);
+                        });
+                        
+                        // إضافة معالج حدث لأزرار الحذف
+                        document.querySelectorAll('.delete-btn').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                const repairId = e.currentTarget.dataset.id;
+                                if (confirm('هل أنت متأكد من حذف هذه الصورة؟')) {
+                                    try {
+                                        const response = await fetch(`/api/repairs/${repairId}`, {
+                                            method: 'DELETE'
+                                        });
+                                        
+                                        if (response.ok) {
+                                            showMessage('تم حذف الصورة بنجاح', 'success');
+                                            fetchAndDisplayRepairs();
+                                        } else {
+                                            const errorData = await response.json();
+                                            showMessage('فشل في حذف الصورة: ' + errorData.message, 'error');
+                                        }
+                                    } catch (error) {
+                                        showMessage('حدث خطأ في الشبكة', 'error');
+                                        console.error(error);
+                                    }
+                                }
+                            });
+                        });
+                    }
+
+                } catch (error) {
+                    console.error('فشل في جلب صور الإصلاحات:', error);
+                    repairsGallery.innerHTML = '<p>عذراً، فشل في تحميل معرض الإصلاحات. يرجى المحاولة لاحقاً.</p>';
+                }
+            };
+            
+            // معالج حدث لرفع الصور
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('title', document.getElementById('title').value);
+                formData.append('image', document.getElementById('image').files[0]);
+                
+                try {
+                    const response = await fetch('/api/repairs', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        showMessage('تم رفع الصورة بنجاح', 'success');
+                        uploadForm.reset();
+                        fetchAndDisplayRepairs();
+                    } else {
+                        const errorData = await response.json();
+                        showMessage('فشل في رفع الصورة: ' + errorData.message, 'error');
+                    }
+                } catch (error) {
+                    showMessage('حدث خطأ في الشبكة', 'error');
+                    console.error(error);
+                }
+            });
+            
+            // جلب وعرض صور الإصلاحات عند تحميل الصفحة
+            fetchAndDisplayRepairs();
+        });
+    </script>
+</body>
+</html>
