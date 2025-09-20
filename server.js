@@ -201,7 +201,8 @@ app.delete("/api/repairs/:id", async (req, res) => {
 });
 
 // ====================== إعادة توجيه أي طلب إلى index.html ====================== //
-app.get("*", (req, res) => {
+// هنا الفرق عن Express 4: استخدم هذا الصياغة لتجنب PathError في Express 5
+app.get("/:path(*)", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
