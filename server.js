@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const { createClient } = require("@supabase/supabase-js");
@@ -194,7 +193,7 @@ app.delete("/api/repairs/:id", async (req, res) => {
 });
 
 // ====================== إعادة توجيه أي طلب إلى index.html ====================== //
-app.get("/:path(*)", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
