@@ -1,199 +1,109 @@
-// server.js
 const express = require("express");
 const mongoose = require("mongoose");
-const { createClient } = require("@supabase/supabase-js");
 const multer = require("multer");
 const path = require("path");
+const { createClient } = require("@supabase/supabase-js");
 require("dotenv").config();
 
-// استدعاء الموديلات
+// استدعاء الموديل
 const Product = require("./models/Product");
-const Repair = require("./models/Repair");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ====================== Middleware ====================== //
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// ملفات static
-app.use(express.static(path.join(__dirname, "public")));
-
-// إعداد القوالب EJS
+// إعدادات الـ views
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// إعداد Supabase Client
-const supabase = createClient(
-  process.env.SUPABASE_URL || "https://ikpijsdqmavklpgunumm.supabase.co",
-  process.env.SUPABASE_KEY || "YOUR_PUBLIC_ANON_KEY"
-);
+// ميدل وير
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
-// إعداد Multer لتخزين الملفات في الذاكرة
-const upload = multer({ storage: multer.memoryStorage() });
+// إعداد Multer لحفظ الملفات مؤقتاً
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// ====================== الاتصال بقاعدة البيانات ====================== //
+// إنشاء عملاء Supabase
+const client1 = createClient(process.env.SUPABASE_URL_1, process.env.SUPABASE_KEY_1);
+const client2 = createClient(process.env.SUPABASE_URL_2, process.env.SUPABASE_KEY_2);
+
+const clients = [client1, client2];
+let current = 0; // مؤشر للتناوب
+
+function getNextClient() {
+  const client = clients[current];
+  current = (current + 1) % clients.length;
+  return client;
+}
+
+// الاتصال بقاعدة البيانات
 mongoose
-  .connect(
-    process.env.MONGO_URI ||
-      "mongodb+srv://GM-MOHAMED:Sqdl0o6aZgGE2DmA@cluster0.ljrua7h.mongodb.net/all-data?retryWrites=true&w=majority"
-  )
-  .then(() => console.log("✅ Connected to MongoDB Atlas!"))
-  .catch((err) => console.error("❌ Connection error:", err));
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 // ====================== Routes ====================== //
 
-// صفحة تجريبية EJS
-app.get("/ap", (req, res) => {
-  res.render("ui");
-});
-
-// صفحة إدارة المنتجات
-app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "admin.html"));
-});
-
-// صفحة إدارة الإصلاحات
-app.get("/repair-admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "repair-admin.html"));
-});
-
-// ====================== Product Routes ====================== //
-app.get("/api/products", async (req, res) => {
+// API لإضافة منتج جديد
+app.post("/products", upload.single("image"), async (req, res) => {
   try {
-    const products = await Product.find({});
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch products.", error: error.message });
-  }
-});
+    const { name, description, price } = req.body;
+    const file = req.file;
 
-app.post("/api/products", upload.single("image"), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ message: "An image is required." });
+    let imageUrl = null;
+    if (file) {
+      const client = getNextClient(); // التناوب بين الحسابين
+      const fileName = `${Date.now()}-${file.originalname}`;
 
-    const { data, error } = await supabase.storage
-      .from("products")
-      .upload(`public/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
-        cacheControl: "3600",
-        upsert: true,
-      });
-
-    if (error) throw error;
-
-    const { data: publicUrlData } = supabase.storage
-      .from("products")
-      .getPublicUrl(data.path);
-
-    const newProduct = new Product({
-      name: req.body.name,
-      description: req.body.description,
-      price: req.body.price,
-      category: req.body.category,
-      imageURL: publicUrlData.publicUrl,
-    });
-
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    res.status(400).json({ message: "Failed to create product.", error: error.message });
-  }
-});
-
-app.put("/api/products/:id", upload.single("image"), async (req, res) => {
-  try {
-    const productId = req.params.id;
-    let updateData = { ...req.body };
-
-    if (req.file) {
-      const { data, error } = await supabase.storage
-        .from("products")
-        .upload(`public/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
-          cacheControl: "3600",
-          upsert: true,
+      const { data, error } = await client
+        .storage
+        .from("public1") // اسم الـ bucket الجديد
+        .upload(fileName, file.buffer, {
+          contentType: file.mimetype,
+          upsert: false
         });
-      if (error) throw error;
 
-      const { data: publicUrlData } = supabase.storage
-        .from("products")
-        .getPublicUrl(data.path);
-      updateData.imageURL = publicUrlData.publicUrl;
+      if (error) {
+        console.error("خطأ في رفع الصورة:", error.message);
+        return res.status(500).json({ error: "فشل رفع الصورة" });
+      }
+
+      const { data: publicUrlData } = client
+        .storage
+        .from("public1")
+        .getPublicUrl(fileName);
+
+      imageUrl = publicUrlData.publicUrl;
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(productId, updateData, {
-      new: true,
-      runValidators: true,
+    // إنشاء المنتج وتخزين رابط الصورة
+    const product = new Product({
+      name,
+      description,
+      price,
+      image: imageUrl
     });
+    await product.save();
 
-    if (!updatedProduct) return res.status(404).json({ message: "Product not found." });
-
-    res.status(200).json(updatedProduct);
-  } catch (error) {
-    res.status(400).json({ message: "Failed to update product.", error: error.message });
+    res.status(201).json({ message: "تمت إضافة المنتج بنجاح", product });
+  } catch (err) {
+    console.error("خطأ:", err.message);
+    res.status(500).json({ error: "حدث خطأ أثناء إضافة المنتج" });
   }
 });
 
-app.delete("/api/products/:id", async (req, res) => {
+// API لعرض جميع المنتجات
+app.get("/products", async (req, res) => {
   try {
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    if (!deletedProduct) return res.status(404).json({ message: "Product not found." });
-    res.status(200).json({ message: "Product deleted successfully." });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete product.", error: error.message });
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: "فشل جلب المنتجات" });
   }
 });
 
-// ====================== Repair Routes ====================== //
-app.get("/api/repairs", async (req, res) => {
-  try {
-    const repairs = await Repair.find({});
-    res.status(200).json(repairs);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch repairs.", error: error.message });
-  }
-});
-
-app.post("/api/repairs", upload.single("image"), async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ message: "An image is required." });
-
-    const { data, error } = await supabase.storage
-      .from("repairs")
-      .upload(`public/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
-        cacheControl: "3600",
-        upsert: true,
-      });
-
-    if (error) throw error;
-
-    const { data: publicUrlData } = supabase.storage
-      .from("repairs")
-      .getPublicUrl(data.path);
-
-    const newRepair = new Repair({
-      title: req.body.title || "إصلاح ناجح",
-      imageURL: publicUrlData.publicUrl,
-    });
-
-    const savedRepair = await newRepair.save();
-    res.status(201).json(savedRepair);
-  } catch (error) {
-    res.status(400).json({ message: "Failed to create repair.", error: error.message });
-  }
-});
-
-app.delete("/api/repairs/:id", async (req, res) => {
-  try {
-    const deletedRepair = await Repair.findByIdAndDelete(req.params.id);
-    if (!deletedRepair) return res.status(404).json({ message: "Repair not found." });
-    res.status(200).json({ message: "Repair deleted successfully." });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete repair.", error: error.message });
-  }
-});
-
-// ====================== Server ====================== //
+// تشغيل السيرفر
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
