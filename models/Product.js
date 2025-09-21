@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'التصنيف إجباري.'],
-    enum: ['إلكترونيات', 'ملابس', 'أثاث', 'كتب', 'أخرى']
+    enum: ['موبايلات', 'رواتر', 'كاميرات مراقبة', 'اكسسوارات موبايلات', 'أخرى']
   },
   imageURL: {
     type: String,
