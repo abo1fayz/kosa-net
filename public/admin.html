@@ -3,221 +3,454 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم - المنتجات</title>
+  <title>إدارة المنتجات</title>
   <style>
+    /* عام */
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #f9f9f9;
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
+
+    /* الحاوية */
+    .container {
+      width: 90%;
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* العنوان */
     h1 {
       text-align: center;
+      margin-bottom: 20px;
       color: #333;
     }
-    form {
-      background: #fff;
-      padding: 20px;
-      margin-bottom: 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,.1);
-    }
-    input, textarea {
-      display: block;
+
+    /* النموذج */
+    form input,
+    form textarea,
+    form select,
+    form button {
       width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #28a745;
-      color: #fff;
       padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    form button {
+      background: #4CAF50;
+      color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
-    button:hover {
-      background: #218838;
+
+    form button:hover {
+      background: #45a049;
     }
-    .product {
-      background: #fff;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,.1);
+
+    /* المنتجات */
+    #product-list-container {
+      margin-top: 20px;
+    }
+
+    .product-list-item {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-    }
-    .product img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .actions button {
-      margin-left: 5px;
-      background: #007bff;
-    }
-    .actions button.delete {
-      background: #dc3545;
-    }
-    .actions button:hover {
-      opacity: 0.9;
-    }
-    #preview {
-      margin-top: 10px;
-      max-width: 150px;
-      display: none;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.2);
-    }
-    #msg {
-      margin-bottom: 15px;
+      align-items: center;
+      background: #fafafa;
+      border: 1px solid #eee;
       padding: 10px;
-      border-radius: 5px;
+      margin: 10px 0;
+      border-radius: 8px;
+      transition: transform 0.2s ease;
+    }
+
+    .product-list-item:hover {
+      transform: scale(1.01);
+    }
+
+    .product-list-item img {
+      max-width: 50px;
+      max-height: 50px;
+      margin-right: 10px;
+      border-radius: 6px;
+    }
+
+    .product-list-item .product-info {
+      flex: 1;
+    }
+
+    .product-list-item .product-info span {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .product-list-item .product-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .product-list-item button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .product-list-item .edit-btn {
+      background: #2196F3;
+      color: white;
+    }
+
+    .product-list-item .edit-btn:hover {
+      background: #1976D2;
+    }
+
+    .product-list-item .delete-btn {
+      background: #f44336;
+      color: white;
+    }
+
+    .product-list-item .delete-btn:hover {
+      background: #d32f2f;
+    }
+
+    /* شريط التحميل */
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 4px;
+      background: linear-gradient(90deg, #4CAF50, #2196F3);
+      transition: width 0.3s ease;
+      z-index: 9999;
+    }
+
+    /* التصنيف في قائمة المنتجات */
+    .category-badge {
+      display: inline-block;
+      background: #e0e0e0;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-right: 5px;
+    }
+
+    /* معاينة الصورة */
+    .image-preview {
+      max-width: 100%;
+      max-height: 200px;
+      margin-top: 10px;
+      border-radius: 8px;
       display: none;
     }
-    #msg.success { background: #d4edda; color: #155724; }
-    #msg.error { background: #f8d7da; color: #721c24; }
+
+    /* معلومات الضغط */
+    .compression-info {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+      padding: 8px;
+      background: #f0f8ff;
+      border-radius: 6px;
+      border-right: 3px solid #4CAF50;
+    }
   </style>
 </head>
 <body>
-  <h1>لوحة التحكم - إدارة المنتجات</h1>
+  <!-- شريط التحميل -->
+  <div class="loading-bar" id="loading-bar"></div>
 
-  <!-- رسائل -->
-  <div id="msg"></div>
+  <div class="container">
+    <h1>إدارة المنتجات</h1>
+    <a href="./repair-admin.html">ادراة قسم الصيانة</a>
 
-  <!-- إضافة منتج جديد -->
-  <form id="productForm">
-    <input type="text" name="name" placeholder="اسم المنتج" required>
-    <textarea name="description" placeholder="الوصف" required></textarea>
-    <input type="number" name="price" placeholder="السعر" required>
-    <input type="text" name="category" placeholder="التصنيف" required>
-    <input type="file" id="imageInput" name="image" accept="image/*" required>
-    <img id="preview" alt="معاينة الصورة">
-    <button type="submit">➕ إضافة المنتج</button>
-  </form>
+    <!-- النموذج -->
+    <form id="product-form" enctype="multipart/form-data">
+      <input type="text" id="name" name="name" placeholder="اسم المنتج" required>
+      <textarea id="description" name="description" placeholder="وصف المنتج" required></textarea>
+      <input type="number" id="price" name="price" placeholder="السعر" required>
+      
+      <!-- خانة التصنيف الجديدة -->
+      <select id="category" name="category" required>
+        <option value="" disabled selected>اختر التصنيف</option>
+        <option value="إلكترونيات">إلكترونيات</option>
+        <option value="ملابس">ملابس</option>
+        <option value="أثاث">أثاث</option>
+        <option value="كتب">كتب</option>
+        <option value="أخرى">أخرى</option>
+      </select>
+      
+      <input type="file" id="image" name="image" accept="image/*" required>
+      
+      <!-- معاينة الصورة -->
+      <img id="image-preview" class="image-preview" alt="معاينة الصورة">
+      
+      <!-- معلومات الضغط -->
+      <div class="compression-info" id="compression-info">
+        سيتم ضغط الصورة تلقائياً بنسبة 80% قبل الرفع لتوفير المساحة وتحسين سرعة التحميل.
+      </div>
+      
+      <button type="submit" id="submit-btn">إضافة المنتج</button>
+    </form>
 
-  <!-- قائمة المنتجات -->
-  <div id="productList"></div>
+    <!-- قائمة المنتجات -->
+    <div id="product-list-container"></div>
+  </div>
+
+  <!-- مكتبة لضغط الصور -->
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.0/dist/browser-image-compression.js"></script>
 
   <script>
-    const productForm = document.getElementById("productForm");
-    const productList = document.getElementById("productList");
-    const msg = document.getElementById("msg");
-    const imageInput = document.getElementById("imageInput");
-    const preview = document.getElementById("preview");
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('product-form');
+      const nameInput = document.getElementById('name');
+      const descriptionInput = document.getElementById('description');
+      const priceInput = document.getElementById('price');
+      const categoryInput = document.getElementById('category');
+      const imageInput = document.getElementById('image');
+      const imagePreview = document.getElementById('image-preview');
+      const compressionInfo = document.getElementById('compression-info');
+      const productListContainer = document.getElementById('product-list-container');
+      const submitBtn = document.getElementById('submit-btn');
+      const loadingBar = document.getElementById('loading-bar');
 
-    // عرض رسائل
-    function showMsg(text, type="success") {
-      msg.textContent = text;
-      msg.className = type === "success" ? "success" : "error";
-      msg.style.display = "block";
-      setTimeout(() => msg.style.display = "none", 3000);
-    }
+      let isEditMode = false;
+      let currentProductId = null;
+      let originalImageFile = null;
 
-    // معاينة الصورة
-    imageInput.addEventListener("change", () => {
-      const file = imageInput.files[0];
-      if (file) {
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = "block";
-      } else {
-        preview.style.display = "none";
-      }
-    });
-
-    // جلب المنتجات
-    async function fetchProducts() {
-      const res = await fetch("/api/products");
-      const products = await res.json();
-      productList.innerHTML = "";
-      products.forEach(p => {
-        const div = document.createElement("div");
-        div.className = "product";
-        div.innerHTML = `
-          <div>
-            <img src="${p.imageURL}" alt="${p.name}">
-            <strong>${p.name}</strong><br>
-            ${p.price} ل.س<br>
-            <small>${p.category}</small>
-          </div>
-          <div class="actions">
-            <button onclick="editProduct('${p._id}')">✏️ تعديل</button>
-            <button class="delete" onclick="deleteProduct('${p._id}')">🗑 حذف</button>
-          </div>
-        `;
-        productList.appendChild(div);
-      });
-    }
-
-    // إضافة منتج
-    productForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(productForm);
-
-      try {
-        const res = await fetch("/api/products", {
-          method: "POST",
-          body: formData
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          showMsg("✅ تمت إضافة المنتج بنجاح");
-          productForm.reset();
-          preview.style.display = "none";
-          fetchProducts();
-        } else {
-          showMsg("❌ فشل إضافة المنتج: " + (data.message || "خطأ"), "error");
+      // معاينة الصورة عند اختيارها
+      imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          originalImageFile = file;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+            compressionInfo.textContent = `الحجم الأصلي: ${formatFileSize(file.size)} - سيتم ضغط الصورة تلقائياً بنسبة 80%`;
+          };
+          reader.readAsDataURL(file);
         }
-      } catch (err) {
-        showMsg("⚠️ مشكلة في الاتصال: " + err.message, "error");
-      }
-    });
-
-    // حذف منتج
-    async function deleteProduct(id) {
-      if (!confirm("هل تريد حذف هذا المنتج؟")) return;
-      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        showMsg("🗑️ تم حذف المنتج");
-        fetchProducts();
-      } else {
-        showMsg("❌ فشل الحذف", "error");
-      }
-    }
-
-    // تعديل منتج
-    async function editProduct(id) {
-      const newName = prompt("اسم المنتج الجديد:");
-      const newPrice = prompt("السعر الجديد:");
-      const newCategory = prompt("التصنيف الجديد:");
-      const newDesc = prompt("الوصف الجديد:");
-
-      const formData = new FormData();
-      if (newName) formData.append("name", newName);
-      if (newPrice) formData.append("price", newPrice);
-      if (newCategory) formData.append("category", newCategory);
-      if (newDesc) formData.append("description", newDesc);
-
-      const res = await fetch(`/api/products/${id}`, {
-        method: "PUT",
-        body: formData
       });
 
-      if (res.ok) {
-        showMsg("✅ تم التعديل بنجاح");
-        fetchProducts();
-      } else {
-        showMsg("❌ فشل التعديل", "error");
+      // دالة لتحويل حجم الملف إلى صيغة مقروءة
+      function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
       }
-    }
 
-    fetchProducts();
+      // إظهار شريط التحميل
+      const showLoading = () => {
+        loadingBar.style.width = "70%";
+      };
+
+      // إخفاء شريط التحميل
+      const hideLoading = () => {
+        loadingBar.style.width = "100%";
+        setTimeout(() => {
+          loadingBar.style.width = "0%";
+        }, 500);
+      };
+
+      // دالة لضغط الصورة تلقائياً بنسبة 80%
+      async function compressImage(file) {
+        try {
+          const options = {
+            maxSizeMB: 1,
+            maxWidth: 1200, // عرض ثابت
+            useWebWorker: true,
+            quality: 0.8 // جودة ثابتة 80%
+          };
+
+          const compressedFile = await imageCompression(file, options);
+          compressionInfo.textContent += ` | بعد الضغط: ${formatFileSize(compressedFile.size)} 
+                                         (تم توفير ${Math.round((1 - compressedFile.size/file.size) * 100)}%)`;
+          
+          // تحويل Blob إلى File للحفاظ على اسم الملف
+          const convertedFile = new File([compressedFile], file.name, {
+            type: compressedFile.type,
+            lastModified: Date.now()
+          });
+          
+          return convertedFile;
+        } catch (error) {
+          console.error('Error compressing image:', error);
+          alert('حدث خطأ في ضغط الصورة. سيتم رفع الصورة الأصلية.');
+          return file;
+        }
+      }
+
+      const fetchAndDisplayProducts = async () => {
+        try {
+          showLoading();
+          const response = await fetch('/api/products');
+          const products = await response.json();
+          productListContainer.innerHTML = '';
+          
+          products.forEach(product => {
+            const item = document.createElement('div');
+            item.classList.add('product-list-item');
+            item.innerHTML = `
+              <div class="product-info">
+                <span><strong>${product.name}</strong> - ${product.price} ر.س</span>
+                <span>${product.description}</span>
+                <span><span class="category-badge">${product.category}</span></span>
+              </div>
+              <div>
+                <img src="${product.imageURL}" alt="${product.name}">
+              </div>
+              <div class="product-actions">
+                <button class="edit-btn" data-id="${product._id}">تعديل</button>
+                <button class="delete-btn" data-id="${product._id}">حذف</button>
+              </div>
+            `;
+            productListContainer.appendChild(item);
+          });
+        } catch (error) {
+          console.error('Failed to fetch products:', error);
+          alert('فشل في تحميل المنتجات. يرجى التحقق من اتصال الإنترنت.');
+        } finally {
+          hideLoading();
+        }
+      };
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // ضغط الصورة قبل الرفع
+        let imageFile = originalImageFile;
+        if (imageFile) {
+          try {
+            showLoading();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جاري ضغط الصورة...';
+            
+            imageFile = await compressImage(originalImageFile);
+            
+            submitBtn.textContent = 'جاري رفع المنتج...';
+          } catch (error) {
+            console.error('Error in image compression:', error);
+            alert('حدث خطأ في معالجة الصورة. يرجى المحاولة مرة أخرى.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = isEditMode ? 'تعديل المنتج' : 'إضافة المنتج';
+            hideLoading();
+            return;
+          }
+        }
+
+        const formData = new FormData();
+        formData.append('name', nameInput.value);
+        formData.append('description', descriptionInput.value);
+        formData.append('price', priceInput.value);
+        formData.append('category', categoryInput.value);
+        if (imageFile) {
+          formData.append('image', imageFile);
+        }
+        
+        const url = isEditMode ? `/api/products/${currentProductId}` : '/api/products';
+        const method = isEditMode ? 'PUT' : 'POST';
+
+        try {
+          const response = await fetch(url, {
+            method: method,
+            body: formData
+          });
+
+          if (response.ok) {
+            alert(isEditMode ? 'تم تعديل المنتج بنجاح!' : 'تم إضافة المنتج بنجاح!');
+            form.reset();
+            imagePreview.style.display = 'none';
+            compressionInfo.textContent = 'سيتم ضغط الصورة تلقائياً بنسبة 80% قبل الرفع لتوفير المساحة وتحسين سرعة التحميل.';
+            isEditMode = false;
+            currentProductId = null;
+            submitBtn.textContent = 'إضافة المنتج';
+            fetchAndDisplayProducts();
+          } else {
+            const errorData = await response.json();
+            alert('فشل العملية: ' + errorData.message);
+          }
+        } catch (error) {
+          alert('حدث خطأ في الشبكة.');
+          console.error(error);
+        } finally {
+          submitBtn.disabled = false;
+          hideLoading();
+        }
+      });
+
+      productListContainer.addEventListener('click', async (e) => {
+        const btn = e.target;
+        const productId = btn.dataset.id;
+
+        if (btn.classList.contains('delete-btn')) {
+          if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+            try {
+              showLoading();
+              const response = await fetch(`/api/products/${productId}`, {
+                method: 'DELETE'
+              });
+
+              if (response.ok) {
+                alert('تم حذف المنتج بنجاح!');
+                fetchAndDisplayProducts();
+              } else {
+                const errorData = await response.json();
+                alert('فشل الحذف: ' + errorData.message);
+              }
+            } catch (error) {
+              alert('حدث خطأ في الشبكة.');
+            } finally {
+              hideLoading();
+            }
+          }
+        }
+
+        if (btn.classList.contains('edit-btn')) {
+          try {
+            showLoading();
+            const response = await fetch(`/api/products/${productId}`);
+            const productToEdit = await response.json();
+            
+            nameInput.value = productToEdit.name;
+            descriptionInput.value = productToEdit.description;
+            priceInput.value = productToEdit.price;
+            categoryInput.value = productToEdit.category;
+
+            isEditMode = true;
+            currentProductId = productToEdit._id;
+            submitBtn.textContent = 'تعديل المنتج';
+            
+            // إخفاء معاينة الصورة عند التعديل (لأننا لا نستطيع عرض الصورة الحالية)
+            imagePreview.style.display = 'none';
+            compressionInfo.textContent = 'سيتم الاحتفاظ بالصورة الحالية ما لم تقم باختيار صورة جديدة.';
+            
+            // التمرير إلى الأعلى لرؤية النموذج
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          } catch (error) {
+            console.error('Failed to fetch product for editing:', error);
+            alert('فشل في تحميل بيانات المنتج للتعديل.');
+          } finally {
+            hideLoading();
+          }
+        }
+      });
+
+      fetchAndDisplayProducts();
+    });
   </script>
 </body>
 </html>
