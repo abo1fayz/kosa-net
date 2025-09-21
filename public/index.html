@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -75,8 +76,6 @@
             border-radius: 12px;
             margin: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            position: relative;
         }
 
         .update-title {
@@ -91,30 +90,20 @@
             margin-left: 8px;
         }
 
-        .products-scroll-container {
-            overflow: hidden;
-            position: relative;
-            padding: 5px 0;
-        }
-
         .products-scroll {
             display: flex;
+            overflow-x: auto;
             gap: 18px;
             padding: 8px 0;
-            animation: scroll 30s linear infinite;
         }
 
-        .products-scroll:hover {
-            animation-play-state: paused;
+        .products-scroll::-webkit-scrollbar {
+            height: 6px;
         }
 
-        @keyframes scroll {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
+        .products-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 10px;
         }
 
         .scroll-item {
@@ -126,7 +115,7 @@
         }
 
         .scroll-item:hover {
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-3px);
         }
 
         .scroll-img {
@@ -137,11 +126,6 @@
             background-color: #fff;
             padding: 5px;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .scroll-item:hover .scroll-img {
-            transform: rotate(5deg);
         }
 
         .scroll-name {
@@ -761,10 +745,8 @@
         <!-- قسم التحديثات والعروض -->
         <div class="update-section">
             <div class="update-title"><i class="fas fa-bolt"></i>أحدث المنتجات</div>
-            <div class="products-scroll-container">
-                <div class="products-scroll" id="latest-products">
-                    <!-- سيتم ملء هذا القسم بالمنتجات الحديثة من خلال JavaScript -->
-                </div>
+            <div class="products-scroll" id="latest-products">
+                <!-- سيتم ملء هذا القسم بالمنتجات الحديثة من خلال JavaScript -->
             </div>
         </div>
 
@@ -870,61 +852,13 @@
                 noProductsMessage.style.display = 'none'; // إخفاء رسالة عدم وجود منتجات
 
                 try {
-                    // في هذا المثال، سنستخدم بيانات وهمية بدلاً من الاتصال بخادم حقيقي
-                    // يمكنك استبدال هذا الجزء باتصال API حقيقي
-                    await new Promise(resolve => setTimeout(resolve, 1000)); // محاكاة تأخير الشبكة
+                    const response = await fetch('/api/products');
                     
-                    // بيانات وهمية للمنتجات
-                    allProducts = [
-                        {
-                            id: 1,
-                            name: "هاتف سامسونج جالاكسي",
-                            description: "هاتف ذكي بمواصفات عالية وكاميرا ممتازة",
-                            price: "1200",
-                            category: "موبايلات",
-                            imageURL: "https://via.placeholder.com/200"
-                        },
-                        {
-                            id: 2,
-                            name: "راوتر لاسلكي",
-                            description: "راوتر سريع يغطي مساحة كبيرة",
-                            price: "300",
-                            category: "رواتر",
-                            imageURL: "https://via.placeholder.com/200"
-                        },
-                        {
-                            id: 3,
-                            name: "كاميرا مراقبة",
-                            description: "كاميرا مراقبة عالية الدقة مع رؤية ليلية",
-                            price: "450",
-                            category: "كاميرات مراقبة",
-                            imageURL: "https://via.placeholder.com/200"
-                        },
-                        {
-                            id: 4,
-                            name: "غطاء هاتف",
-                            description: "غطاء واقي لهواتف سامسونج",
-                            price: "50",
-                            category: "اكسسوارات موبايلات",
-                            imageURL: "https://via.placeholder.com/200"
-                        },
-                        {
-                            id: 5,
-                            name: "شاحن لاسلكي",
-                            description: "شاحن لاسلكي سريع متوافق مع جميع الأجهزة",
-                            price: "80",
-                            category: "اكسسوارات موبايلات",
-                            imageURL: "https://via.placeholder.com/200"
-                        },
-                        {
-                            id: 6,
-                            name: "سماعات بلوتوث",
-                            description: "سماعات لاسلكية عالية الجودة",
-                            price: "150",
-                            category: "أخرى",
-                            imageURL: "https://via.placeholder.com/200"
-                        }
-                    ];
+                    if (!response.ok) {
+                        throw new Error(`خطأ في جلب البيانات: ${response.status}`);
+                    }
+                    
+                    allProducts = await response.json(); // حفظ جميع المنتجات
                     
                     loadingSpinner.style.display = 'none'; // إخفاء مؤشر التحميل
                     
@@ -948,10 +882,7 @@
                 // نأخذ فقط 5 منتجات كأحدث المنتجات
                 const latestProducts = products.slice(0, 5);
                 
-                // مضاعفة المنتجات لتحقيق تأثير التمرير المستمر
-                const duplicatedProducts = [...latestProducts, ...latestProducts];
-                
-                duplicatedProducts.forEach(product => {
+                latestProducts.forEach(product => {
                     const scrollItem = document.createElement('div');
                     scrollItem.classList.add('scroll-item');
                     
