@@ -1,144 +1,170 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('product-form');
-    const nameInput = document.getElementById('name');
-    const descriptionInput = document.getElementById('description');
-    const priceInput = document.getElementById('price');
-    const imageInput = document.getElementById('image');
-    const productListContainer = document.getElementById('product-list-container');
-    const submitBtn = document.getElementById('submit-btn');
-    const loadingBar = document.getElementById('loading-bar');
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - إدارة المنتجات</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { text-align: center; }
+    form, .product {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    input, button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover { background: #45a049; }
+    .danger { background: #e74c3c; }
+    .danger:hover { background: #c0392b; }
+    img {
+      max-width: 100px;
+      border-radius: 6px;
+      display: block;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
 
-    let isEditMode = false;
-    let currentProductId = null;
+  <h1>لوحة التحكم - إدارة المنتجات</h1>
 
-    // إظهار شريط التحميل
-    const showLoading = () => {
-        loadingBar.style.width = "70%";
-    };
+  <!-- فورم إضافة منتج -->
+  <form id="addProductForm" enctype="multipart/form-data">
+    <h2>➕ إضافة منتج جديد</h2>
+    <input type="text" name="name" placeholder="اسم المنتج" required>
+    <input type="text" name="description" placeholder="الوصف">
+    <input type="number" name="price" placeholder="السعر" required>
+    <input type="text" name="category" placeholder="التصنيف">
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">إضافة المنتج</button>
+  </form>
 
-    // إخفاء شريط التحميل
-    const hideLoading = () => {
-        loadingBar.style.width = "100%";
-        setTimeout(() => {
-            loadingBar.style.width = "0%";
-        }, 500);
-    };
+  <h2>📦 جميع المنتجات</h2>
+  <div id="productsContainer"></div>
 
-    const fetchAndDisplayProducts = async () => {
-        try {
-            showLoading();
-            const response = await fetch('/api/products');
-            const products = await response.json();
-            productListContainer.innerHTML = '';
-            
-            products.forEach(product => {
-                const item = document.createElement('div');
-                item.classList.add('product-list-item');
-                item.innerHTML = `
-                    <span>${product.name} - ${product.price} -
-                        <img id="imgui" src="${product.imageURL}"> ر.س
-                    </span>
-                    <div>
-                        <button class="edit-btn" data-id="${product._id}">تعديل</button>
-                        <button class="delete-btn" data-id="${product._id}">حذف</button>
-                    </div>
-                `;
-                productListContainer.appendChild(item);
-            });
-        } catch (error) {
-            console.error('Failed to fetch products:', error);
-        } finally {
-            hideLoading();
-        }
-    };
+  <script>
+    const productsContainer = document.getElementById("productsContainer");
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // جلب جميع المنتجات
+    async function fetchProducts() {
+      productsContainer.innerHTML = "<p>⏳ جاري التحميل...</p>";
+      const res = await fetch("/api/products");
+      const products = await res.json();
+      if (!res.ok) {
+        productsContainer.innerHTML = "<p>❌ فشل في تحميل المنتجات</p>";
+        return;
+      }
+      renderProducts(products);
+    }
 
-        const formData = new FormData();
-        formData.append('name', nameInput.value);
-        formData.append('description', descriptionInput.value);
-        formData.append('price', priceInput.value);
-        if (imageInput.files[0]) {
-            formData.append('image', imageInput.files[0]);
-        }
-        
-        const url = isEditMode ? `/api/products/${currentProductId}` : '/api/products';
-        const method = isEditMode ? 'PUT' : 'POST';
+    // عرض المنتجات
+    function renderProducts(products) {
+      if (products.length === 0) {
+        productsContainer.innerHTML = "<p>لا يوجد منتجات</p>";
+        return;
+      }
+      productsContainer.innerHTML = "";
+      products.forEach((p) => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <h3>${p.name}</h3>
+          <p>${p.description || ""}</p>
+          <p><strong>السعر:</strong> ${p.price} </p>
+          <p><strong>التصنيف:</strong> ${p.category || "غير محدد"}</p>
+          <img src="${p.imageURL}" alt="${p.name}">
+          <button onclick="deleteProduct('${p._id}')" class="danger">🗑 حذف</button>
+          <button onclick="editProduct('${p._id}')">✏️ تعديل</button>
+        `;
+        productsContainer.appendChild(div);
+      });
+    }
 
-        try {
-            showLoading();
-            const response = await fetch(url, {
-                method: method,
-                body: formData
-            });
+    // إضافة منتج جديد
+    document.getElementById("addProductForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
 
-            if (response.ok) {
-                alert(isEditMode ? 'تم تعديل المنتج بنجاح!' : 'تم إضافة المنتج بنجاح!');
-                form.reset();
-                isEditMode = false;
-                currentProductId = null;
-                submitBtn.textContent = 'إضافة المنتج';
-                fetchAndDisplayProducts();
-            } else {
-                const errorData = await response.json();
-                alert('فشل العملية: ' + errorData.message);
-            }
-        } catch (error) {
-            alert('حدث خطأ في الشبكة.');
-            console.error(error);
-        } finally {
-            hideLoading();
-        }
+      const res = await fetch("/api/products", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("✅ تم إضافة المنتج بنجاح");
+        e.target.reset();
+        fetchProducts();
+      } else {
+        alert("❌ فشل: " + (data.error || data.message));
+      }
     });
 
-    productListContainer.addEventListener('click', async (e) => {
-        const btn = e.target;
-        const productId = btn.dataset.id;
+    // حذف منتج
+    async function deleteProduct(id) {
+      if (!confirm("هل أنت متأكد من الحذف؟")) return;
+      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (res.ok) {
+        alert("🗑 تم الحذف");
+        fetchProducts();
+      } else {
+        alert("❌ فشل الحذف: " + (data.error || data.message));
+      }
+    }
 
-        if (btn.classList.contains('delete-btn')) {
-            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                try {
-                    showLoading();
-                    const response = await fetch(`/api/products/${productId}`, {
-                        method: 'DELETE'
-                    });
+    // تعديل منتج
+    async function editProduct(id) {
+      const name = prompt("اسم المنتج الجديد:");
+      const description = prompt("الوصف الجديد:");
+      const price = prompt("السعر الجديد:");
+      const category = prompt("التصنيف الجديد:");
 
-                    if (response.ok) {
-                        alert('تم حذف المنتج بنجاح!');
-                        fetchAndDisplayProducts();
-                    } else {
-                        const errorData = await response.json();
-                        alert('فشل الحذف: ' + errorData.message);
-                    }
-                } catch (error) {
-                    alert('حدث خطأ في الشبكة.');
-                } finally {
-                    hideLoading();
-                }
-            }
-        }
+      if (!name || !price) return alert("⚠️ الاسم والسعر مطلوبان");
 
-        if (btn.classList.contains('edit-btn')) {
-            try {
-                showLoading();
-                const response = await fetch(`/api/products/${productId}`);
-                const productToEdit = await response.json();
-                
-                nameInput.value = productToEdit.name;
-                descriptionInput.value = productToEdit.description;
-                priceInput.value = productToEdit.price;
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("price", price);
+      formData.append("category", category);
 
-                isEditMode = true;
-                currentProductId = productToEdit._id;
-                submitBtn.textContent = 'تعديل المنتج';
-            } catch (error) {
-                console.error('Failed to fetch product for editing:', error);
-            } finally {
-                hideLoading();
-            }
-        }
-    });
+      const res = await fetch(`/api/products/${id}`, {
+        method: "PUT",
+        body: formData
+      });
 
-    fetchAndDisplayProducts();
-});
+      const data = await res.json();
+      if (res.ok) {
+        alert("✏️ تم التعديل بنجاح");
+        fetchProducts();
+      } else {
+        alert("❌ فشل التعديل: " + (data.error || data.message));
+      }
+    }
+
+    // تحميل المنتجات عند فتح الصفحة
+    fetchProducts();
+  </script>
+
+</body>
+</html>
