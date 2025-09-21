@@ -20,6 +20,7 @@
             color: #333;
             direction: rtl;
             line-height: 1.6;
+            position: relative;
         }
 
         .app-layout {
@@ -76,6 +77,8 @@
             border-radius: 12px;
             margin: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
         }
 
         .update-title {
@@ -95,6 +98,24 @@
             overflow-x: auto;
             gap: 18px;
             padding: 8px 0;
+            scroll-behavior: smooth;
+        }
+
+        .products-scroll.auto-scroll {
+            animation: autoScroll 30s linear infinite;
+        }
+
+        @keyframes autoScroll {
+            0% {
+                transform: translateX(0%);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .products-scroll:hover {
+            animation-play-state: paused;
         }
 
         .products-scroll::-webkit-scrollbar {
@@ -730,6 +751,17 @@
                 height: 180px;
             }
         }
+
+        /* توقيع المطور */
+        .developer-signature {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            font-size: 10px;
+            color: rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            font-family: 'Cairo', sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -745,7 +777,7 @@
         <!-- قسم التحديثات والعروض -->
         <div class="update-section">
             <div class="update-title"><i class="fas fa-bolt"></i>أحدث المنتجات</div>
-            <div class="products-scroll" id="latest-products">
+            <div class="products-scroll auto-scroll" id="latest-products">
                 <!-- سيتم ملء هذا القسم بالمنتجات الحديثة من خلال JavaScript -->
             </div>
         </div>
@@ -794,6 +826,9 @@
                 <span>الخدمات العامة</span>
             </a>
         </nav>
+
+        <!-- توقيع المطور -->
+        <div class="developer-signature">تطوير: GM-MOHAMED</div>
     </div>
 
     <!-- نافذة المنتج المنبثقة -->
