@@ -75,6 +75,8 @@
             border-radius: 12px;
             margin: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
         }
 
         .update-title {
@@ -94,6 +96,8 @@
             overflow-x: auto;
             gap: 18px;
             padding: 8px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
 
         .products-scroll::-webkit-scrollbar {
@@ -111,10 +115,12 @@
             text-align: center;
             transition: transform 0.2s;
             cursor: pointer;
+            animation: float 3s ease-in-out infinite;
         }
 
         .scroll-item:hover {
             transform: translateY(-3px);
+            animation-play-state: paused;
         }
 
         .scroll-img {
@@ -135,6 +141,48 @@
             text-overflow: ellipsis;
         }
 
+        /* أنيميشن للعناصر في قسم أحدث المنتجات */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* تأثيرات إضافية للخلفية */
+        .update-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: pulse 8s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(-5px, 5px) rotate(1deg);
+            }
+            50% {
+                transform: translate(5px, -5px) rotate(0deg);
+            }
+            75% {
+                transform: translate(-5px, 5px) rotate(-1deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+
+        /* بقية الأنماط تبقى كما هي */
         /* قسم البحث والفلاتر */
         .search-section {
             padding: 18px;
@@ -695,7 +743,7 @@
             }
             
             .logo {
-                height: 190px;
+                height: 200px;
             }
             
             .section-title {
@@ -734,7 +782,7 @@
 <body>
     <div class="app-layout">
         <!-- الشريط العلوي -->
-        <header class="top-bar">
+        <header  class="top-bar">
             <div class="logo-container">
                 <img src="./photo_2025-09-19_22-25-34.jpg" alt="Logo" class="logo">
             </div>
@@ -747,6 +795,7 @@
             <div class="products-scroll" id="latest-products">
                 <!-- سيتم ملء هذا القسم بالمنتجات الحديثة من خلال JavaScript -->
             </div>
+            <p style="padding-top: 5px; font-size: 10px; color: #25D366;">مطور التطبيق : GM-MOHAMED</p>
         </div>
 
         <!-- قسم البحث والفلاتر -->
@@ -767,6 +816,7 @@
 
         <!-- قسم المنتجات -->
         <section class="products-section">
+            
             <h2 class="section-title">منتجاتنا</h2>
             
             <div id="loading-spinner" class="spinner"></div>
@@ -778,8 +828,8 @@
             <p id="no-products-message" class="no-products" style="display: none;">لا توجد منتجات مطابقة.</p>
         </section>
 
-        <!-- شريط التنقل السفلي -->
-        <nav class="bottom-nav">
+        
+            <nav class="bottom-nav">
             <a href="/" class="nav-item active">
                 <i class="fas fa-home nav-icon"></i>
                 <span>الرئيسية</span>
@@ -792,7 +842,16 @@
                 <i class="fas fa-shopping-cart nav-icon"></i>
                 <span>الخدمات العامة</span>
             </a>
+            
         </nav>
+        
+        
+
+        
+
+        <!-- شريط التنقل السفلي -->
+        
+        
     </div>
 
     <!-- نافذة المنتج المنبثقة -->
@@ -819,5 +878,149 @@
                 </button>
             </div>
         </div>
-    </div></body>
-</html> 
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productsContainer = document.getElementById('products-container');
+            const latestProductsContainer = document.getElementById('latest-products');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const searchInput = document.getElementById('search-input');
+            const categoriesFilter = document.getElementById('categories-filter');
+            const noProductsMessage = document.getElementById('no-products-message');
+
+            let allProducts = []; // لتخزين جميع المنتجات التي تم جلبها
+
+            // دالة لجلب وعرض المنتجات
+            const fetchAndDisplayProducts = async () => {
+                productsContainer.innerHTML = ''; // مسح المحتوى القديم
+                latestProductsContainer.innerHTML = ''; // مسح المحتوى القديم
+                loadingSpinner.style.display = 'block'; // إظهار مؤشر التحميل
+                noProductsMessage.style.display = 'none'; // إخفاء رسالة عدم وجود منتجات
+
+                try {
+                    const response = await fetch('/api/products');
+                    
+                    if (!response.ok) {
+                        throw new Error(`خطأ في جلب البيانات: ${response.status}`);
+                    }
+                    
+                    allProducts = await response.json(); // حفظ جميع المنتجات
+                    
+                    loadingSpinner.style.display = 'none'; // إخفاء مؤشر التحميل
+                    
+                    // عرض أحدث المنتجات في قسم التحديثات
+                    displayLatestProducts(allProducts);
+                    
+                    // فلترة وعرض المنتجات عند التحميل الأولي
+                    filterAndRenderProducts();
+
+                } catch (error) {
+                    console.error('فشل في جلب المنتجات:', error);
+                    loadingSpinner.style.display = 'none';
+                    productsContainer.innerHTML = ''; // تأكد من مسح أي محتوى قديم
+                    noProductsMessage.textContent = 'عذراً، فشل في تحميل المنتجات. يرجى المحاولة لاحقاً.';
+                    noProductsMessage.style.display = 'block';
+                }
+            };
+
+            // دالة لعرض أحدث المنتجات
+            const displayLatestProducts = (products) => {
+                // نأخذ فقط 5 منتجات كأحدث المنتجات
+                const latestProducts = products.slice(0, 5);
+                
+                latestProducts.forEach(product => {
+                    const scrollItem = document.createElement('div');
+                    scrollItem.classList.add('scroll-item');
+                    
+                    scrollItem.innerHTML = `
+                        <img src="${product.imageURL}" alt="${product.name}" class="scroll-img">
+                        <div class="scroll-name">${product.name}</div>
+                    `;
+                    
+                    latestProductsContainer.appendChild(scrollItem);
+                });
+            };
+
+            // دالة لفلترة وعرض المنتجات
+            const filterAndRenderProducts = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const activeCategoryBtn = categoriesFilter.querySelector('.category-btn.active');
+                const selectedCategory = activeCategoryBtn ? activeCategoryBtn.dataset.category : 'الكل';
+
+                const filteredProducts = allProducts.filter(product => {
+                    const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                                          (product.description && product.description.toLowerCase().includes(searchTerm));
+                    
+                    // فلترة حسب التصنيف
+                    const matchesCategory = selectedCategory === 'الكل' || product.category === selectedCategory;
+                    
+                    return matchesSearch && matchesCategory;
+                });
+
+                productsContainer.innerHTML = ''; // مسح القائمة الحالية قبل عرض المنتجات المفلترة
+
+                if (filteredProducts.length === 0) {
+                    noProductsMessage.textContent = 'لا توجد منتجات مطابقة.';
+                    noProductsMessage.style.display = 'block';
+                } else {
+                    noProductsMessage.style.display = 'none';
+                    filteredProducts.forEach(product => {
+                        const productCard = document.createElement('div');
+                        productCard.classList.add('product-card');
+
+                        productCard.innerHTML = `
+                            <img src="${product.imageURL}" alt="${product.name}" class="product-image">
+                            <div class="product-info">
+                                <h3 class="product-name">${product.name}</h3>
+                                <p class="product-desc">${product.description || 'لا يوجد وصف'}</p>
+                                <div>
+                                    <span class="category-badge">${product.category || 'غير مصنف'}</span>
+                                </div>
+                                <div class="product-price-container">
+                                    <div class="price-container">
+                                        <span class="discount-price">${product.price} $</span>
+                                    </div>
+                                    <button class="whatsapp-btn" onclick="shareProduct('${product.name}', '${product.imageURL}')">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        productsContainer.appendChild(productCard);
+                    });
+                }
+            };
+
+            // دالة لمشاركة المنتج عبر واتساب
+           window.shareProduct = (productName, productImage) => {
+    const phoneNumber = "905387709053"; // ضع رقمك هنا بصيغة دولية
+    const message = `مرحبا! أريد الاستفسار عن المنتج: ${productName}`;
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+};
+
+            // معالج حدث لإدخال البحث
+            searchInput.addEventListener('input', filterAndRenderProducts);
+
+            // معالج حدث لأزرار الفئات
+            categoriesFilter.addEventListener('click', (e) => {
+                if (e.target.classList.contains('category-btn')) {
+                    // إزالة الفئة النشطة من جميع الأزرار
+                    categoriesFilter.querySelectorAll('.category-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    // تفعيل الزر الذي تم النقر عليه
+                    e.target.classList.add('active');
+                    filterAndRenderProducts(); // إعادة فلترة وعرض المنتجات
+                }
+            });
+
+            // جلب وعرض المنتجات عند تحميل الصفحة
+            fetchAndDisplayProducts();
+        });
+    </script>
+</body>
+</html>
