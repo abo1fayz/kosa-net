@@ -1,8 +1,8 @@
-// server.js
 const express = require("express");
 const mongoose = require("mongoose");
 const { createClient } = require("@supabase/supabase-js");
 const multer = require("multer");
+const sharp = require("sharp"); // 🟢 لتحويل الصور
 const path = require("path");
 require("dotenv").config();
 
@@ -70,23 +70,28 @@ app.get("/api/products", async (req, res) => {
     const products = await Product.find({});
     res.status(200).json(products);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch products.", error: error.message });
+    res.status(500).json({ message: "Failed to fetch products.", error: error.message });
   }
 });
 
-// 2. إضافة منتج جديد مع صورة
+// 2. إضافة منتج جديد مع صورة (تحويل إلى JPG)
 app.post("/api/products", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file)
-      return res.status(400).json({ message: "An image is required." });
+    if (!req.file) return res.status(400).json({ message: "An image is required." });
+
+    // 🟢 تحويل الصورة إلى JPG باستخدام sharp
+    const processedImage = await sharp(req.file.buffer)
+      .jpeg({ quality: 90 })
+      .toBuffer();
+
+    const fileName = `public/${Date.now()}.jpg`;
 
     const { data, error } = await supabase.storage
       .from("products")
-      .upload(`public/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
+      .upload(fileName, processedImage, {
         cacheControl: "3600",
         upsert: true,
+        contentType: "image/jpeg"
       });
 
     if (error) throw error;
@@ -106,29 +111,31 @@ app.post("/api/products", upload.single("image"), async (req, res) => {
     const savedProduct = await newProduct.save();
     res.status(201).json(savedProduct);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to create product.", error: error.message });
+    res.status(400).json({ message: "Failed to create product.", error: error.message });
   }
 });
 
-// 3. تعديل منتج معين
+// 3. تعديل منتج معين مع تحديث الصورة
 app.put("/api/products/:id", upload.single("image"), async (req, res) => {
   try {
     const productId = req.params.id;
     let updateData = { ...req.body };
 
     if (req.file) {
+      // 🟢 تحويل الصورة إلى JPG
+      const processedImage = await sharp(req.file.buffer)
+        .jpeg({ quality: 90 })
+        .toBuffer();
+
+      const fileName = `public/${Date.now()}.jpg`;
+
       const { data, error } = await supabase.storage
         .from("products")
-        .upload(
-          `public/${Date.now()}-${req.file.originalname}`,
-          req.file.buffer,
-          {
-            cacheControl: "3600",
-            upsert: true,
-          }
-        );
+        .upload(fileName, processedImage, {
+          cacheControl: "3600",
+          upsert: true,
+          contentType: "image/jpeg"
+        });
       if (error) throw error;
 
       const { data: publicUrlData } = supabase.storage
@@ -142,14 +149,11 @@ app.put("/api/products/:id", upload.single("image"), async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     );
-    if (!updatedProduct)
-      return res.status(404).json({ message: "Product not found." });
+    if (!updatedProduct) return res.status(404).json({ message: "Product not found." });
 
     res.status(200).json(updatedProduct);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to update product.", error: error.message });
+    res.status(400).json({ message: "Failed to update product.", error: error.message });
   }
 });
 
@@ -157,13 +161,10 @@ app.put("/api/products/:id", upload.single("image"), async (req, res) => {
 app.delete("/api/products/:id", async (req, res) => {
   try {
     const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    if (!deletedProduct)
-      return res.status(404).json({ message: "Product not found." });
+    if (!deletedProduct) return res.status(404).json({ message: "Product not found." });
     res.status(200).json({ message: "Product deleted successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to delete product.", error: error.message });
+    res.status(500).json({ message: "Failed to delete product.", error: error.message });
   }
 });
 
@@ -171,13 +172,10 @@ app.delete("/api/products/:id", async (req, res) => {
 app.get("/api/products/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product)
-      return res.status(404).json({ message: "Product not found." });
+    if (!product) return res.status(404).json({ message: "Product not found." });
     res.status(200).json(product);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch product.", error: error.message });
+    res.status(500).json({ message: "Failed to fetch product.", error: error.message });
   }
 });
 
@@ -189,23 +187,27 @@ app.get("/api/repairs", async (req, res) => {
     const repairs = await Repair.find({});
     res.status(200).json(repairs);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch repairs.", error: error.message });
+    res.status(500).json({ message: "Failed to fetch repairs.", error: error.message });
   }
 });
 
 // 2. إضافة إصلاح جديد مع صورة
 app.post("/api/repairs", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file)
-      return res.status(400).json({ message: "An image is required." });
+    if (!req.file) return res.status(400).json({ message: "An image is required." });
+
+    const processedImage = await sharp(req.file.buffer)
+      .jpeg({ quality: 90 })
+      .toBuffer();
+
+    const fileName = `public/${Date.now()}.jpg`;
 
     const { data, error } = await supabase.storage
       .from("repairs")
-      .upload(`public/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
+      .upload(fileName, processedImage, {
         cacheControl: "3600",
         upsert: true,
+        contentType: "image/jpeg"
       });
 
     if (error) throw error;
@@ -222,9 +224,7 @@ app.post("/api/repairs", upload.single("image"), async (req, res) => {
     const savedRepair = await newRepair.save();
     res.status(201).json(savedRepair);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to create repair.", error: error.message });
+    res.status(400).json({ message: "Failed to create repair.", error: error.message });
   }
 });
 
@@ -232,13 +232,10 @@ app.post("/api/repairs", upload.single("image"), async (req, res) => {
 app.delete("/api/repairs/:id", async (req, res) => {
   try {
     const deletedRepair = await Repair.findByIdAndDelete(req.params.id);
-    if (!deletedRepair)
-      return res.status(404).json({ message: "Repair not found." });
+    if (!deletedRepair) return res.status(404).json({ message: "Repair not found." });
     res.status(200).json({ message: "Repair deleted successfully." });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to delete repair.", error: error.message });
+    res.status(500).json({ message: "Failed to delete repair.", error: error.message });
   }
 });
 
