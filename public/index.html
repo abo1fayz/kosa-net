@@ -13,6 +13,57 @@
             padding: 0;
         }
 
+
+
+
+        .secret-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, #4a6bdf, #6a11cb);
+    color: rgb(10, 151, 46);
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    z-index: 9999;
+    transition: transform 0.3s ease-in-out, opacity 0.3s;
+    opacity: 0;
+}
+
+/* عندما تظهر */
+.secret-popup.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+/* زر إغلاق */
+.secret-popup .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: rgb(201, 170, 35);
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #f5f7fa;
@@ -787,10 +838,12 @@
                 <img src="./photo_2025-09-19_22-25-34.jpg" alt="Logo" class="logo">
             </div>
             <div></div> <!-- عنصر نائب للمحاذاة -->
+            
         </header>
 
         <!-- قسم التحديثات والعروض -->
         <div class="update-section">
+            <a href="admin.html">الادراة _ ...</a>
             <div class="update-title"><i class="fas fa-bolt"></i>أحدث المنتجات</div>
             <div class="products-scroll" id="latest-products">
                 <!-- سيتم ملء هذا القسم بالمنتجات الحديثة من خلال JavaScript -->
@@ -813,6 +866,10 @@
                 <button class="category-btn" data-category="أخرى">أخرى</button>
             </div>
         </section>
+        <div id="secretPopup" class="secret-popup">
+    <button class="close-btn" onclick="closeSecret()">×</button>
+    المطور : محمد مسلم GM-MOHAMED😉
+    </div>
 
         <!-- قسم المنتجات -->
         <section class="products-section">
@@ -942,6 +999,55 @@
                     latestProductsContainer.appendChild(scrollItem);
                 });
             };
+
+
+
+
+
+            const searchInput1 = document.getElementById('search-input');
+const secretPopup = document.getElementById('secretPopup');
+
+searchInput1.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && searchInput1.value === 'GM-MOHAMED') {
+        showSecret();
+        searchInput1.value = ''; // مسح النص بعد التفعيل
+    }
+});
+
+function showSecret() {
+    secretPopup.classList.add('show');
+    // تختفي تلقائياً بعد 3 ثواني
+    setTimeout(() => {
+        secretPopup.classList.remove('show');
+    }, 3000);
+}
+
+function closeSecret() {
+    secretPopup.classList.remove('show');
+}
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             // دالة لفلترة وعرض المنتجات
             const filterAndRenderProducts = () => {
