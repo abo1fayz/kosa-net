@@ -13,56 +13,41 @@
             padding: 0;
         }
 
-
-
-
         .secret-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    background: linear-gradient(135deg, #4a6bdf, #6a11cb);
-    color: rgb(10, 151, 46);
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-align: center;
-    z-index: 9999;
-    transition: transform 0.3s ease-in-out, opacity 0.3s;
-    opacity: 0;
-}
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #4a6bdf, #6a11cb);
+            color: rgb(10, 151, 46);
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            z-index: 9999;
+            transition: transform 0.3s ease-in-out, opacity 0.3s;
+            opacity: 0;
+        }
 
-/* عندما تظهر */
-.secret-popup.show {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-}
+        /* عندما تظهر */
+        .secret-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
 
-/* زر إغلاق */
-.secret-popup .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 30px;
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    color: rgb(201, 170, 35);
-    cursor: pointer;
-}
-
-
-
-
-
-
-
-
-
-
-
-
+        /* زر إغلاق */
+        .secret-popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 30px;
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            color: rgb(201, 170, 35);
+            cursor: pointer;
+        }
 
         body {
             font-family: 'Cairo', sans-serif;
@@ -330,10 +315,11 @@
             font-weight: 700;
         }
 
+        /* تحسين تخطيط الشبكة لعرض 3 منتجات في الصف على الموبايل */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
+            gap: 15px;
         }
 
         .product-card {
@@ -346,6 +332,7 @@
             flex-direction: column;
             border: 1px solid #f1f1f1;
             cursor: pointer;
+            height: 100%; /* لجعل جميع البطاقات بنفس الارتفاع */
         }
 
         .product-card:hover {
@@ -355,38 +342,49 @@
 
         .product-image {
             width: 100%;
-            height: 200px;
+            height: 150px; /* تقليل الارتفاع قليلاً */
             object-fit: cover;
             background: linear-gradient(45deg, #f5f7fa, #e4e7eb);
         }
 
         .product-info {
-            padding: 18px;
+            padding: 15px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
         .product-name {
-            font-size: 1.15rem;
-            margin-bottom: 10px;
+            font-size: 1rem; /* تصغير حجم الخط */
+            margin-bottom: 8px;
             color: #2d3748;
             font-weight: 700;
+            line-height: 1.3;
+            height: 2.6em; /* تحديد ارتفاع ثابت لاسم المنتج */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* تحديد عدد الأسطر */
+            -webkit-box-orient: vertical;
         }
 
         .product-desc {
             color: #718096;
-            font-size: 0.95rem;
-            margin-bottom: 12px;
+            font-size: 0.85rem; /* تصغير حجم الخط */
+            margin-bottom: 10px;
             flex-grow: 1;
-            line-height: 1.5;
+            line-height: 1.4;
+            height: 2.8em; /* تحديد ارتفاع ثابت للوصف */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* تحديد عدد الأسطر */
+            -webkit-box-orient: vertical;
         }
 
         .product-price-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .price-container {
@@ -397,13 +395,13 @@
         .original-price {
             color: #a0aec0;
             text-decoration: line-through;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .discount-price {
             color: #e53e3e;
             font-weight: 800;
-            font-size: 1.3rem;
+            font-size: 1.1rem; /* تصغير حجم الخط قليلاً */
         }
 
         .discount-badge {
@@ -420,13 +418,13 @@
             color: white;
             border: none;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
+            width: 40px; /* تصغير الحجم قليلاً */
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             flex-shrink: 0;
             box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
             transition: all 0.3s;
@@ -435,6 +433,19 @@
         .whatsapp-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
+        }
+
+        /* شارة التصنيف على بطاقة المنتج */
+        .category-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+            padding: 4px 10px; /* تصغير الحجم قليلاً */
+            border-radius: 15px;
+            font-size: 0.75rem; /* تصغير حجم الخط */
+            margin-right: 5px;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
         }
 
         /* شريط التنقل السفلي */
@@ -505,19 +516,6 @@
             color: #718096;
             grid-column: 1 / -1;
             font-size: 1.1rem;
-        }
-
-        /* شارة التصنيف على بطاقة المنتج */
-        .category-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            margin-right: 5px;
-            margin-bottom: 8px;
-            color: #4a5568;
-            font-weight: 600;
         }
 
         /* نافذة المنتج المنبثقة */
@@ -678,35 +676,22 @@
             }
         }
 
-        @media (max-width: 767px) {
-            .modal-content {
-                max-width: 95%;
-            }
-            
-            .modal-title {
-                font-size: 1.2rem;
-            }
-            
-            .modal-price {
-                font-size: 1.5rem;
-            }
-        }
-
+        /* تحسين التصميم المتجاوب */
         @media (max-width: 1024px) {
             .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+                grid-template-columns: repeat(3, 1fr); /* 3 منتجات في الصف */
+                gap: 15px;
             }
             
             .product-image {
-                height: 180px;
+                height: 140px;
             }
         }
 
         @media (max-width: 768px) {
             .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
+                grid-template-columns: repeat(3, 1fr); /* 3 منتجات في الصف على الموبايل */
+                gap: 12px;
             }
             
             .product-card {
@@ -714,7 +699,7 @@
             }
             
             .product-image {
-                height: 160px;
+                height: 130px;
             }
             
             .product-info {
@@ -722,21 +707,21 @@
             }
             
             .product-name {
-                font-size: 1.05rem;
+                font-size: 0.95rem;
             }
             
             .product-desc {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
             }
             
             .discount-price {
-                font-size: 1.15rem;
+                font-size: 1rem;
             }
             
             .whatsapp-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 1.1rem;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
             }
             
             .categories {
@@ -773,20 +758,20 @@
 
         @media (max-width: 480px) {
             .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                grid-template-columns: repeat(3, 1fr); /* 3 منتجات في الصف على الشاشات الصغيرة */
+                gap: 10px;
             }
             
             .product-image {
-                height: 140px;
+                height: 110px;
             }
             
             .product-name {
-                font-size: 1rem;
+                font-size: 0.9rem;
             }
             
             .discount-price {
-                font-size: 1.05rem;
+                font-size: 0.95rem;
             }
             
             .top-bar {
@@ -821,11 +806,11 @@
 
         @media (max-width: 360px) {
             .products-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr); /* 2 منتجات في الصف على الشاشات الصغيرة جداً */
             }
             
             .product-image {
-                height: 180px;
+                height: 120px;
             }
         }
     </style>
@@ -843,7 +828,6 @@
 
         <!-- قسم التحديثات والعروض -->
         <div class="update-section">
-            <!-- <a href="admin.html">الادراة _ ...</a> -->
             <div class="update-title"><i class="fas fa-bolt"></i>أحدث المنتجات</div>
             <div class="products-scroll" id="latest-products">
                 <!-- سيتم ملء هذا القسم بالمنتجات الحديثة من خلال JavaScript -->
@@ -867,9 +851,9 @@
             </div>
         </section>
         <div id="secretPopup" class="secret-popup">
-    <button class="close-btn" onclick="closeSecret()">×</button>
-    المطور : محمد مسلم GM-MOHAMED😉
-    </div>
+            <button class="close-btn" onclick="closeSecret()">×</button>
+            المطور : محمد مسلم GM-MOHAMED😉
+        </div>
 
         <!-- قسم المنتجات -->
         <section class="products-section">
@@ -885,8 +869,7 @@
             <p id="no-products-message" class="no-products" style="display: none;">لا توجد منتجات مطابقة.</p>
         </section>
 
-        
-            <nav class="bottom-nav">
+        <nav class="bottom-nav">
             <a href="/" class="nav-item active">
                 <i class="fas fa-home nav-icon"></i>
                 <span>الرئيسية</span>
@@ -899,16 +882,7 @@
                 <i class="fas fa-shopping-cart nav-icon"></i>
                 <span>الخدمات العامة</span>
             </a>
-            
         </nav>
-        
-        
-
-        
-
-        <!-- شريط التنقل السفلي -->
-        
-        
     </div>
 
     <!-- نافذة المنتج المنبثقة -->
@@ -937,7 +911,6 @@
         </div>
     </div>
 
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const productsContainer = document.getElementById('products-container');
@@ -946,8 +919,11 @@
             const searchInput = document.getElementById('search-input');
             const categoriesFilter = document.getElementById('categories-filter');
             const noProductsMessage = document.getElementById('no-products-message');
+            const productModal = document.getElementById('product-modal');
+            const closeModalBtn = document.querySelector('.close-modal');
 
             let allProducts = []; // لتخزين جميع المنتجات التي تم جلبها
+            let currentProduct = null; // لتخزين المنتج الحالي المعروض في النافذة المنبثقة
 
             // دالة لجلب وعرض المنتجات
             const fetchAndDisplayProducts = async () => {
@@ -996,58 +972,68 @@
                         <div class="scroll-name">${product.name}</div>
                     `;
                     
+                    // إضافة حدث النقر لعرض المنتج في النافذة المنبثقة
+                    scrollItem.addEventListener('click', () => {
+                        showProductModal(product);
+                    });
+                    
                     latestProductsContainer.appendChild(scrollItem);
                 });
             };
 
+            // دالة لعرض النافذة المنبثقة للمنتج
+            const showProductModal = (product) => {
+                currentProduct = product;
+                
+                document.getElementById('modal-product-name').textContent = product.name;
+                document.getElementById('modal-product-image').src = product.imageURL;
+                document.getElementById('modal-product-description').textContent = product.description || 'لا يوجد وصف مفصل لهذا المنتج';
+                document.getElementById('modal-product-category').textContent = product.category || 'غير مصنف';
+                document.getElementById('modal-product-price').textContent = `${product.price} $`;
+                
+                // تحديث رابط واتساب
+                const modalWhatsappBtn = document.getElementById('modal-whatsapp-btn');
+                modalWhatsappBtn.onclick = () => shareProduct(product.name, product.imageURL);
+                
+                productModal.style.display = 'block';
+            };
 
+            // دالة لإغلاق النافذة المنبثقة
+            const closeProductModal = () => {
+                productModal.style.display = 'none';
+                currentProduct = null;
+            };
 
+            // إضافة أحداث إغلاق النافذة المنبثقة
+            closeModalBtn.addEventListener('click', closeProductModal);
+            productModal.addEventListener('click', (e) => {
+                if (e.target === productModal) {
+                    closeProductModal();
+                }
+            });
 
-
+            // دالة للبحث السري
             const searchInput1 = document.getElementById('search-input');
-const secretPopup = document.getElementById('secretPopup');
+            const secretPopup = document.getElementById('secretPopup');
 
-searchInput1.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && searchInput1.value === 'GM-MOHAMED') {
-        showSecret();
-        searchInput1.value = ''; // مسح النص بعد التفعيل
-    }
-});
+            searchInput1.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && searchInput1.value === 'GM-MOHAMED') {
+                    showSecret();
+                    searchInput1.value = ''; // مسح النص بعد التفعيل
+                }
+            });
 
-function showSecret() {
-    secretPopup.classList.add('show');
-    // تختفي تلقائياً بعد 3 ثواني
-    setTimeout(() => {
-        secretPopup.classList.remove('show');
-    }, 3000);
-}
+            function showSecret() {
+                secretPopup.classList.add('show');
+                // تختفي تلقائياً بعد 3 ثواني
+                setTimeout(() => {
+                    secretPopup.classList.remove('show');
+                }, 3000);
+            }
 
-function closeSecret() {
-    secretPopup.classList.remove('show');
-}
-
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
+            function closeSecret() {
+                secretPopup.classList.remove('show');
+            }
 
             // دالة لفلترة وعرض المنتجات
             const filterAndRenderProducts = () => {
@@ -1076,11 +1062,18 @@ function closeSecret() {
                         const productCard = document.createElement('div');
                         productCard.classList.add('product-card');
 
+                        // إنشاء وصف مختصر للمنتج (أول 60 حرفاً)
+                        const shortDescription = product.description ? 
+                            (product.description.length > 60 ? 
+                                product.description.substring(0, 60) + '...' : 
+                                product.description) : 
+                            'لا يوجد وصف';
+
                         productCard.innerHTML = `
                             <img src="${product.imageURL}" alt="${product.name}" class="product-image">
                             <div class="product-info">
                                 <h3 class="product-name">${product.name}</h3>
-                                <p class="product-desc">${product.description || 'لا يوجد وصف'}</p>
+                                <p class="product-desc">${shortDescription}</p>
                                 <div>
                                     <span class="category-badge">${product.category || 'غير مصنف'}</span>
                                 </div>
@@ -1095,18 +1088,23 @@ function closeSecret() {
                             </div>
                         `;
                         
+                        // إضافة حدث النقر لعرض المنتج في النافذة المنبثقة
+                        productCard.addEventListener('click', () => {
+                            showProductModal(product);
+                        });
+                        
                         productsContainer.appendChild(productCard);
                     });
                 }
             };
 
             // دالة لمشاركة المنتج عبر واتساب
-           window.shareProduct = (productName, productImage) => {
-    const phoneNumber = "905387709053"; // ضع رقمك هنا بصيغة دولية
-    const message = `مرحبا! أريد الاستفسار عن المنتج: ${productName}`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-};
+            window.shareProduct = (productName, productImage) => {
+                const phoneNumber = "905387709053"; // ضع رقمك هنا بصيغة دولية
+                const message = `مرحبا! أريد الاستفسار عن المنتج: ${productName}`;
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            };
 
             // معالج حدث لإدخال البحث
             searchInput.addEventListener('input', filterAndRenderProducts);
